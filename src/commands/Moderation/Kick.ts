@@ -141,23 +141,7 @@ export default class Kick extends Command {
       embeds: [
         new EmbedBuilder()
           .setColor("Orange")
-          .setTitle(`🔨 Successfully kicked the user!`)
-          .setThumbnail(target.displayAvatarURL({ size: 64 }))
-          .addFields(
-            {
-              name: "Target:",
-              value: target.user.username,
-            },
-            {
-              name: "Moderator:",
-              value: interaction.user.username,
-            },
-            {
-              name: "Reason:",
-              value: reason,
-            }
-          ),
-      ],
+          .setTitle(`🔨 Successfully kicked the user!`)],
       ephemeral: true,
     });
 
