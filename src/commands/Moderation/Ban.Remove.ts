@@ -106,7 +106,7 @@ export default class BanRemove extends SubCommand {
           embeds: [
             new EmbedBuilder()
               .setColor("Green")
-              .setTitle(`🔨 An user has been unbanned!`)
+              .setTitle(`🔨 A user has been unbanned!`)
               .addFields(
                 {
                   name: "Target:",

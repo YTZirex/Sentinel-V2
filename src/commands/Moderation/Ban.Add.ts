@@ -155,7 +155,7 @@ export default class BanAdd extends SubCommand {
             embeds: [
                 new EmbedBuilder()
             .setColor("Red")
-            .setTitle(`🔨 An user has been banned!`)
+            .setTitle(`🔨 A user has been banned!`)
             .setThumbnail(target.displayAvatarURL({ size: 64 }))
             .addFields(
               {
