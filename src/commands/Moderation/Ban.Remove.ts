@@ -44,17 +44,7 @@ export default class BanRemove extends SubCommand {
 
     try {
       await interaction.guild?.bans.remove(target!, reason);
-    } catch (err) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            "❌ An error occured while trying to unban the user."
-          ),
-        ],
-      });
-      console.log(err);
-    }
-
+      
     interaction.reply({
       embeds: [
         new EmbedBuilder()
@@ -89,7 +79,6 @@ export default class BanRemove extends SubCommand {
         })
         .then(async (x) => await x.react("🔨"));
     }
-
     const guild = await GuildConfig.findOne({ id: interaction.guildId });
 
     if (
@@ -125,5 +114,17 @@ export default class BanRemove extends SubCommand {
         })
         .then(async (x) => x.react("🔨"));
     }
+    
+    } catch (err) {
+      return interaction.reply({
+        embeds: [
+          errorEmbed.setDescription(
+            "❌ An error occured while trying to unban the user."
+          ),
+        ],
+      });
+      console.log(err);
+    }
+
   }
 }

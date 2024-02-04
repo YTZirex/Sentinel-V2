@@ -1,67 +1,41 @@
 import {
-  ApplicationCommandOptionType,
-  CacheType,
   ChatInputCommandInteraction,
-  EmbedBuilder,
+  CacheType,
   GuildMember,
+  EmbedBuilder,
   GuildMemberRoleManager,
-  PermissionsBitField,
   TextChannel,
 } from "discord.js";
-import Command from "../../base/classes/Command";
 import CustomClient from "../../base/classes/CustomClient";
-import Category from "../../base/enums/Category";
+import SubCommand from "../../base/classes/SubCommand";
+import ms from "ms";
 import GuildConfig from "../../base/schemas/GuildConfig";
 
-export default class Kick extends Command {
+export default class TimeoutAdd extends SubCommand {
   constructor(client: CustomClient) {
     super(client, {
-      name: "kick",
-      description: "Kicks a user from the server.",
-      category: Category.Moderation,
-      options: [
-        {
-          name: "target",
-          description: "The user to kick.",
-          type: ApplicationCommandOptionType.User,
-          required: true,
-        },
-        {
-          name: "reason",
-          description: "The reason for kicking the user.",
-          type: ApplicationCommandOptionType.String,
-          required: false,
-        },
-        {
-          name: "silent",
-          description: "Don't send a message to the channel.",
-          type: ApplicationCommandOptionType.Boolean,
-          required: false,
-        },
-      ],
-      default_member_permissions: PermissionsBitField.Flags.KickMembers,
-      dm_permission: false,
-      cooldown: 5,
-      dev: false,
+      name: "timeout.add",
     });
   }
   async Execute(interaction: ChatInputCommandInteraction) {
-    let target = interaction.options.getMember("target") as GuildMember;
-    let reason =
-      interaction.options.getString("reason") || "No reason provided.";
-    let silent = interaction.options.getBoolean("silent") || false;
+    const target = interaction.options.getMember("target") as GuildMember;
+    const duration = interaction.options.getString("duration") || "5m";
+    const reason =
+      interaction.options.getString("reason") || "No reason was provided.";
+    const silent = interaction.options.getBoolean("silent") || false;
+    const msDuration = ms(duration);
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle(`Oops!`);
 
     if (!target)
       return interaction.reply({
-        embeds: [errorEmbed.setDescription(`❌ Please provide a valid user.`)],
+        embeds: [errorEmbed.setDescription("❌ Please provide a valid user.")],
         ephemeral: true,
       });
 
     if (target.id === interaction.user.id)
       return interaction.reply({
-        embeds: [errorEmbed.setDescription(`❌ You cannot kick yourself.`)],
+        embeds: [errorEmbed.setDescription("❌ You cannot timeout yourself.")],
         ephemeral: true,
       });
 
@@ -72,15 +46,22 @@ export default class Kick extends Command {
       return interaction.reply({
         embeds: [
           errorEmbed.setDescription(
-            `❌ You cannot kick a user with an equal or higher role than you.`
+            "❌ You cannot timeout a user with an equal or higher role than you."
           ),
         ],
         ephemeral: true,
       });
 
-    if (!target.kickable)
+    if (
+      target.communicationDisabledUntil != null &&
+      target.communicationDisabledUntil > new Date()
+    )
       return interaction.reply({
-        embeds: [errorEmbed.setDescription(`❌ This user cannot be kicked.`)],
+        embeds: [
+          errorEmbed.setDescription(
+            `❌ ${target} is already timed out until **${target.communicationDisabledUntil.toLocaleDateString()}**`
+          ),
+        ],
         ephemeral: true,
       });
 
@@ -100,9 +81,12 @@ export default class Kick extends Command {
           new EmbedBuilder()
             .setColor("Orange")
             .setTitle(
-              `🔨 You have been kicked from ${interaction.guild?.name}!`
+              `⏳ You have been timed out from ${interaction.guild?.name}!`
             )
-            .setThumbnail(`${interaction.guild?.iconURL()}`)
+            .setDescription(
+              `If you would like to appeal, please send a message to the moderation who timed you out.`
+            )
+            .setThumbnail(interaction.guild!.iconURL())
             .addFields(
               {
                 name: "Moderator:",
@@ -111,6 +95,10 @@ export default class Kick extends Command {
               {
                 name: "Reason:",
                 value: reason,
+              },
+              {
+                name: "Expires:",
+                value: `<t:${((Date.now() + msDuration) / 1000).toFixed(0)}:F>`,
               }
             ),
         ],
@@ -120,22 +108,23 @@ export default class Kick extends Command {
     }
 
     try {
-      await target.kick(reason);
+      await target.timeout(msDuration, reason);
       interaction.reply({
         embeds: [
           new EmbedBuilder()
             .setColor("Orange")
-            .setTitle(`🔨 Successfully kicked the user!`)],
+            .setTitle(`⏳ Successfully timed out the user!`),
+        ],
         ephemeral: true,
       });
-  
+
       if (!silent) {
         interaction.channel
           ?.send({
             embeds: [
               new EmbedBuilder()
                 .setColor("Orange")
-                .setTitle(`🔨 Successfully kicked the user!`)
+                .setTitle(`⏳ Successfully timed out the user!`)
                 .setThumbnail(target.displayAvatarURL({ size: 64 }))
                 .addFields(
                   {
@@ -149,15 +138,21 @@ export default class Kick extends Command {
                   {
                     name: "Reason:",
                     value: reason,
+                  },
+                  {
+                    name: "Expires:",
+                    value: `<t:${((Date.now() + msDuration) / 1000).toFixed(
+                      0
+                    )}:F>`,
                   }
                 ),
             ],
           })
-          .then(async (x) => await x.react("🔨"));
-  
-  
+          .then(async (x) => await x.react("⏳"));
       }
+
       const guild = await GuildConfig.findOne({ id: interaction.guildId });
+
       if (
         guild &&
         guild?.logs?.moderation?.enabled &&
@@ -167,35 +162,43 @@ export default class Kick extends Command {
           (await interaction.guild?.channels.fetch(
             guild?.logs?.moderation?.channelId
           )) as TextChannel
-        ).send({
-          embeds: [
-            new EmbedBuilder()
-              .setTitle("🔨 A user has been kicked!")
-              .setThumbnail(target.displayAvatarURL({ size: 64 }))
-              .setColor('Orange')
-              .addFields(
-                {
-                  name: "Target:",
-                  value: target.user.username,
-                },
-                {
-                  name: "Moderator:",
-                  value: interaction.user.username,
-                },
-                {
-                  name: "Reason:",
-                  value: reason,
-                }
-              ),
-          ],
-        });
+        )
+          .send({
+            embeds: [
+              new EmbedBuilder()
+                .setColor("Orange")
+                .setTitle("⏳ A user has been timed out!")
+                .setThumbnail(target.displayAvatarURL({ size: 64 }))
+                .addFields(
+                  {
+                    name: "Target:",
+                    value: target.user.username,
+                  },
+                  {
+                    name: "Moderator:",
+                    value: interaction.user.username,
+                  },
+                  {
+                    name: "Reason:",
+                    value: reason,
+                  },
+                  {
+                    name: "Expires:",
+                    value: `<t:${((Date.now() + msDuration) / 1000).toFixed(
+                      0
+                    )}:F>`,
+                  }
+                ),
+            ],
+          })
+          .then((x) => x.react("⏳"));
       }
     } catch (err) {
       console.log(err);
       return interaction.reply({
         embeds: [
           errorEmbed.setDescription(
-            "❌ An error occured while trying to kick the user."
+            "❌ An error occured while trying to timeout the user."
           ),
         ],
         ephemeral: true,

@@ -75,8 +75,7 @@ export default class BanAdd extends SubCommand {
             .setTitle(
               `You have been banned from **${interaction.guild?.name}**!`
             )
-            //@ts-ignore
-            .setThumbnail(interaction.guild.iconURL())
+            .setThumbnail(interaction.guild!.iconURL())
             .setDescription(
               `If you would like to appeal your ban, send a message to the moderator who banned you.`
             )
@@ -103,17 +102,7 @@ export default class BanAdd extends SubCommand {
 
     try {
       await target.ban({ deleteMessageSeconds: messages, reason: reason });
-    } catch (err) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            "❌ An error occured while trying to ban the user."
-          ),
-        ],
-      });
-      console.log(err);
-    }
-
+      
     interaction.reply({
       embeds: [
         new EmbedBuilder()
@@ -174,5 +163,16 @@ export default class BanAdd extends SubCommand {
             ]
         }).then(async(x) => x.react("🔨"))
     }
+    } catch (err) {
+      return interaction.reply({
+        embeds: [
+          errorEmbed.setDescription(
+            "❌ An error occured while trying to ban the user."
+          ),
+        ],
+      });
+      console.log(err);
+    }
+
   }
 }
