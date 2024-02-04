@@ -202,6 +202,7 @@ export default class Kick extends Command {
             new EmbedBuilder()
               .setTitle("🔨 A user has been kicked!")
               .setThumbnail(target.displayAvatarURL({ size: 64 }))
+              .setColor('Orange')
               .addFields(
                 {
                   name: "Target:",
