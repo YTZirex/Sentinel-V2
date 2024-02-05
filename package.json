@@ -17,6 +17,7 @@
   "dependencies": {
     "@types/ms": "^0.7.34",
     "colors": "^1.4.0",
+    "discord-arts": "^0.5.8",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.1",
     "glob": "^10.3.10",
