@@ -18,15 +18,15 @@ export default class LogsToggle extends SubCommand {
     const logType = interaction.options.getString("log-type");
     const enabled = interaction.options.getBoolean("toggle");
 
+    let guild = await GuildConfig.findOne({
+      id: interaction.guildId,
+    });
+
     await interaction.deferReply({
       ephemeral: true,
     });
 
     try {
-      let guild = await GuildConfig.findOne({
-        id: interaction.guildId,
-      });
-
       if (!guild) guild = await GuildConfig.create({ id: interaction.guildId });
 
       //@ts-ignore
@@ -34,28 +34,65 @@ export default class LogsToggle extends SubCommand {
 
       await guild.save();
 
-      return interaction.editReply({
-        embeds: [
-          new EmbedBuilder()
-            .setTitle("Success!")
-            .setColor("Green")
-            .setDescription(
-              `✅ ${enabled ? "Enabled" : "Disabled"} **${logType}** logs.`
-            ),
-        ],
-      });
+      if (guild && guild.language) {
+        return interaction.editReply({
+          embeds: [
+            {
+              color: 0x33cc99,
+              title: `${guild.language === "fr" ? "Succès!" : "Success!"}`,
+              description: `${
+                guild.language === "fr"
+                  ? `✅ J'ai ${
+                      enabled ? "activé" : "désactivé"
+                    } **${logType}** les logs.`
+                  : `✅ ${
+                      enabled ? "Enabled" : "Disabled"
+                    } **${logType}** logs.`
+              }`,
+            },
+          ],
+        });
+      } else {
+        return interaction.editReply({
+          embeds: [
+            {
+              color: 0x33cc99,
+              title: "Success!",
+              description: `✅ ${
+                enabled ? "Enabled" : "Disabled"
+              } **${logType}** logs.`,
+            },
+          ],
+        });
+      }
     } catch (err) {
       console.log(err);
-      return interaction.editReply({
-        embeds: [
-          new EmbedBuilder()
-            .setColor("Red")
-            .setTitle("Oops!")
-            .setDescription(
-              `❌ An error occured while updating the database. Please try again.`
-            ),
-        ],
-      });
+      if (guild && guild.language) {
+        return interaction.editReply({
+          embeds: [
+            {
+              color: 0xff6666,
+              title: "Oops!",
+              description: `${
+                guild.language === "fr"
+                  ? "❌ Une erreur est survenue en mettant à jour la base de donnée. Veuillez réessayer."
+                  : "❌ An error occured while updating the database. Please try again."
+              }`,
+            },
+          ],
+        });
+      } else {
+        return interaction.editReply({
+          embeds: [
+            {
+              color: 0xff6666,
+              title: "Oops!",
+              description:
+                "❌ An error occured while updating the database. Please try again.",
+            },
+          ],
+        });
+      }
     }
   }
 }

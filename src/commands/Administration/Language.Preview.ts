@@ -18,26 +18,26 @@ export default class LanguagePreview extends SubCommand {
         id: interaction.guildId,
       });
 
-      if (!guild || !(guild.language)) {
+      if (guild && guild?.language) {
         return interaction.editReply({
           embeds: [
-            new EmbedBuilder()
-              .setColor("Green")
-              .setTitle(`Hello! The bot is currently in **English** !`),
+            {
+              color: 0x33cc99,
+              description: `${
+                guild.language === "fr"
+                  ? "Bonjour! Le bot est actuellement en **Français** !"
+                  : "Hello! The bot is currently in **English** !"
+              }`,
+            },
           ],
         });
-      } else if (guild && guild?.language) {
+      } else {
         return interaction.editReply({
           embeds: [
-            new EmbedBuilder()
-              .setColor("Green")
-              .setDescription(
-                `${
-                  guild.language === "fr"
-                    ? "Bonjour! Le bot est actuellement en **Français** !"
-                    : "Hello! The bot is currently in **English** !"
-                }`
-              ),
+            {
+              title: "Hello! The bot is currently in **English** !",
+              color: 0x33cc99,
+            },
           ],
         });
       }

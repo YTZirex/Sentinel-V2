@@ -32,7 +32,7 @@ export default class Announcement extends Command {
           required: false,
           type: ApplicationCommandOptionType.Channel,
           description: "The channel where to send the announcement",
-          channel_types: [ChannelType.GuildText, ChannelType.GuildAnnouncement]
+          channel_types: [ChannelType.GuildText, ChannelType.GuildAnnouncement],
         },
       ],
       dev: false,
@@ -43,77 +43,174 @@ export default class Announcement extends Command {
     let channel = (interaction.options.getChannel("channel") ||
       interaction.channel) as TextChannel;
 
+    let guild = await GuildConfig.findOne({ id: interaction.guildId });
+
     let errorEmbed = new EmbedBuilder().setTitle("Oops!").setColor("Red");
 
     if (content!.length > 1024) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            "The announcement must be less than 1024 characters!"
-          ),
-        ],
-        ephemeral: true,
-      });
+      if (guild && guild?.language) {
+        return interaction.reply({
+          embeds: [
+            errorEmbed.setDescription(
+              `❌ ${
+                guild?.language === "fr"
+                  ? "L'annonce doit contenir moins de 1024 charactères !"
+                  : "The announcement must be less than 1024 characters!"
+              }`
+            ),
+          ],
+          ephemeral: true,
+        });
+      } else {
+        return interaction.reply({
+          embeds: [
+            errorEmbed.setDescription(
+              "The announcement must be less than 1024 characters!"
+            ),
+          ],
+          ephemeral: true,
+        });
+      }
     }
 
     try {
-      await channel.send({
-        embeds: [
-          new EmbedBuilder()
-            .setThumbnail(interaction.guild?.iconURL()!)
-            .setColor("Yellow")
-            .setTitle("📢 Announcement")
-            .setDescription((content!).replace(/\|/g, '\n'))
-            .setAuthor({
-              name: interaction.user.username,
-              iconURL: interaction.user.displayAvatarURL(),
-            }),
-        ],
-      });
+      if (guild && guild?.language) {
+        await channel.send({
+          embeds: [
+            new EmbedBuilder()
+              .setThumbnail(interaction.guild?.iconURL()!)
+              .setColor("Yellow")
+              .setTitle(
+                `${
+                  guild.language === "fr"
+                    ? "📢 Nouvelle Annonce"
+                    : "📢 New Announcement"
+                }`
+              )
+              .setDescription(content!.replace(/\|/g, "\n"))
+              .setAuthor({
+                name: interaction.user.username,
+                iconURL: interaction.user.displayAvatarURL(),
+              }),
+          ],
+        });
 
-      interaction.reply({
-        embeds: [
-          new EmbedBuilder()
-            .setColor("Yellow")
-            .setDescription("📢 Successfully sent the announcement!"),
-        ],
-      });
+        interaction.reply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor("Yellow")
+              .setDescription(
+                `${
+                  guild.language === "fr"
+                    ? "📢 L'annonce a été envoyée avec succès !"
+                    : "📢 Successfully sent the announcement!"
+                }`
+              ),
+          ],
+        });
 
-      let guild = await GuildConfig.findOne({ id: interaction.guildId });
+        if (
+          guild &&
+          guild?.logs?.moderation?.enabled &&
+          guild?.logs?.moderation?.channelId
+        ) {
+          try {
+            (
+              (await interaction.guild?.channels.fetch(
+                guild?.logs?.moderation?.channelId
+              )) as TextChannel
+            ).send({
+              embeds: [
+                new EmbedBuilder()
+                  .setThumbnail(interaction.guild?.iconURL()!)
+                  .setColor("Yellow")
+                  .setTitle(
+                    `${
+                      guild.language === "fr"
+                        ? "📢 Nouvelle Annonce"
+                        : "📢 New Announcement"
+                    }`
+                  )
+                  .setDescription(content!.replace(/\|/g, "\n"))
+                  .setAuthor({
+                    name: interaction.user.username,
+                    iconURL: interaction.user.displayAvatarURL(),
+                  }),
+              ],
+            });
+          } catch (err) {}
+        } // HELLO HELLO HELLO
+      } else {
+        await channel.send({
+          embeds: [
+            new EmbedBuilder()
+              .setThumbnail(interaction.guild?.iconURL()!)
+              .setColor("Yellow")
+              .setTitle("📢 Announcement")
+              .setDescription(content!.replace(/\|/g, "\n"))
+              .setAuthor({
+                name: interaction.user.username,
+                iconURL: interaction.user.displayAvatarURL(),
+              }),
+          ],
+        });
 
-      if (
-        guild &&
-        guild?.logs?.moderation?.enabled &&
-        guild?.logs?.moderation?.channelId
-      ) {
-        try {
-          (
-            (await interaction.guild?.channels.fetch(
-              guild?.logs?.moderation?.channelId
-            )) as TextChannel
-          ).send({
-            embeds: [
-              new EmbedBuilder()
-                .setThumbnail(interaction.guild?.iconURL()!)
-                .setColor("Yellow")
-                .setTitle("📢 New Announcement")
-                .setDescription((content!).replace(/\|/g, '\n'))
-                .setAuthor({
-                  name: interaction.user.username,
-                  iconURL: interaction.user.displayAvatarURL(),
-                }),
-            ],
-          });
-        } catch (err) {}
+        interaction.reply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor("Yellow")
+              .setDescription("📢 Successfully sent the announcement!"),
+          ],
+        });
+
+        if (
+          guild &&
+          guild?.logs?.moderation?.enabled &&
+          guild?.logs?.moderation?.channelId
+        ) {
+          try {
+            (
+              (await interaction.guild?.channels.fetch(
+                guild?.logs?.moderation?.channelId
+              )) as TextChannel
+            ).send({
+              embeds: [
+                new EmbedBuilder()
+                  .setThumbnail(interaction.guild?.iconURL()!)
+                  .setColor("Yellow")
+                  .setTitle("📢 New Announcement")
+                  .setDescription(content!.replace(/\|/g, "\n"))
+                  .setAuthor({
+                    name: interaction.user.username,
+                    iconURL: interaction.user.displayAvatarURL(),
+                  }),
+              ],
+            });
+          } catch (err) {}
+        }
       }
     } catch (err) {
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            "❌ An error occured while trying to send the announcement."
-          ),
-        ],
-      });
+      if (guild && guild.language) {
+        return interaction.reply({
+          embeds: [
+            errorEmbed.setDescription(
+              `${
+                guild.language === "fr"
+                  ? "❌ Une erreur est survenue lors de l'envoi de l'annonce"
+                  : "❌ An error occured while trying to send the announcement."
+              }`
+            ),
+          ],
+        });
+      } else {
+        return interaction.reply({
+          embeds: [
+            errorEmbed.setDescription(
+              "❌ An error occured while trying to send the announcement."
+            ),
+          ],
+        });
+      }
     }
   }
 }

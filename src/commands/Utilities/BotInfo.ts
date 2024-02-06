@@ -38,6 +38,41 @@ export default class BotInfo extends Command {
           .join(", ")}\`*/
     interaction.reply({
       embeds: [
+        {
+          color: 0x6666ff,
+          thumbnail: { url: this.client.user!.displayAvatarURL() },
+          description: `
+          __**Bot Info**__
+          > **User:** ${this.client.user?.tag} - ${this.client.user?.id}
+          > **Account Created:** <t:${(
+            this.client.user!.createdTimestamp / 1000
+          ).toFixed(0)}:R>
+          > **Commands:** ${this.client.commands.size}
+          > **DiscordJS Version:** ${version}
+          > **Node Version:** ${process.version}
+          > **Bot Version:** ${this.config.botVersion}
+          > **Dependencies:** ${Object.keys(dependencies).length}
+          > **Uptime:** ${this.uptimeString(Math.floor(process.uptime()))}
+
+          __**Guild Info**__
+          > **Total Guilds:** ${(await this.client.guilds.fetch()).size}
+          > **Total Members:** ${this.client.guilds.cache
+            .map((guild) => guild.memberCount)
+            .reduce((a, b) => a + b, 0)}
+          > **Total Channels:** ${await this.client.channels.cache.size}
+
+          __**System Info**__
+          > **Operating System:** ${process.platform}
+          > **CPU:** ${os.cpus()[0].model.trim()}
+          > **RAM Usage:** ${this.formatBytes(
+            process.memoryUsage().heapUsed
+          )} / ${this.formatBytes(os.totalmem())}
+
+          __**Development Team:**__
+          > **Creators**: Fadzuk, Matt
+          > **Developers:** Matt
+          `
+        },/*
         new EmbedBuilder()
           .setThumbnail(this.client.user?.displayAvatarURL()!)
           .setColor("Random").setDescription(`
@@ -70,8 +105,30 @@ export default class BotInfo extends Command {
                 __**Development Team:**__
                 > **Creators**: Fadzuk, Matt
                 > **Developers:** Matt
-                `),
+                `),*/
       ],
+      components: [
+        {
+          type: 1,
+          components: [
+            {
+              type: 2,
+              style: 5,
+              label: "Invite me!",
+              url: "https://discord.com/api/oauth2/authorize?client_id=1203014293549744189&permissions=70368744177655&scope=applications.commands+bot",
+              emoji: "🔗",
+            },
+            {
+              type: 2,
+              style: 5,
+              label: "Support Server",
+              url: "https://discord.gg/My2BVCmJEY",
+              emoji: "💬",
+            },
+          ],
+        },
+      ],
+      /*
       components: [
         new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
@@ -85,7 +142,7 @@ export default class BotInfo extends Command {
             .setStyle(ButtonStyle.Link)
             .setURL("https://discord.gg/My2BVCmJEY")
         ),
-      ],
+      ],*/
     });
   }
 

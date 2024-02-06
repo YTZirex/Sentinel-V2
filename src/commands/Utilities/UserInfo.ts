@@ -41,54 +41,50 @@ export default class UserInfo extends Command {
 
     return interaction.editReply({
       embeds: [
-        new EmbedBuilder()
-          .setColor(fetchedMember.user.accentColor || "Blurple")
-          .setThumbnail(fetchedMember.displayAvatarURL({ size: 64 }))
-          .setAuthor({
+        {
+          //@ts-ignore
+          color: fetchedMember.user.hexAccentColor || 0x6666ff,
+          thumbnail: {
+            url: fetchedMember.user.displayAvatarURL({ size: 64 }),
+          },
+          author: {
             name: `${fetchedMember.user.tag}'s profile`,
-            iconURL: fetchedMember.displayAvatarURL(),
-          })
-          .setDescription(
-            `
+            icon_url: fetchedMember.displayAvatarURL(),
+          },
+          description: `
 
-                            __**User Info**__
-                            > **ID:** ${fetchedMember.user.id}
-                            > **Bot:** ${fetchedMember.user.bot ? "✅" : "❌"}
-                            > **Account Created:** <t:${(
-                              fetchedMember.user.createdTimestamp / 1000
-                            ).toFixed(0)}:D>
+          __**User Info**__
+          > **ID:** ${fetchedMember.user.id}
+          > **Bot:** ${fetchedMember.user.bot ? "✅" : "❌"}
+          > **Account Created:** <t:${(
+            fetchedMember.user.createdTimestamp / 1000
+          ).toFixed(0)}:D>
 
-                            __**Member Info**__
-                            > **Nickname:** ${
-                              fetchedMember.nickname ||
-                              fetchedMember.user.username
-                            }
-                            > **Roles:** ${
-                              fetchedMember.roles.cache.size - 1
-                            }: ${
-              fetchedMember.roles.cache
-                .map((r) => r)
-                .join(", ")
-                .replace("@everyone", "") || "None"
-            }
-                            > **Administrator Permission:** ${
-                              fetchedMember.permissions.has(
-                                PermissionsBitField.Flags.Administrator
-                              )
-                                ? "✅"
-                                : "❌"
-                            }
-                            > **Joined:** <t:${(
-                              fetchedMember.joinedTimestamp! / 1000
-                            ).toFixed(0)}:D>
-                            > **Join Position:** ${
-                              this.GetJoinPosition(
-                                interaction,
-                                fetchedMember
-                              )! + 1
-                            } / ${interaction.guild?.memberCount}
-                            `
-          ),
+          __**Member Info**__
+          > **Nickname:** ${
+            fetchedMember.nickname || fetchedMember.user.username
+          }
+          > **Roles:** ${fetchedMember.roles.cache.size - 1}: ${
+            fetchedMember.roles.cache
+              .map((r) => r)
+              .join(", ")
+              .replace("@everyone", "") || "None"
+          }
+          > **Administrator Permission:** ${
+            fetchedMember.permissions.has(
+              PermissionsBitField.Flags.Administrator
+            )
+              ? "✅"
+              : "❌"
+          }
+          > **Joined:** <t:${(fetchedMember.joinedTimestamp! / 1000).toFixed(
+            0
+          )}:D>
+          > **Join Position:** ${
+            this.GetJoinPosition(interaction, fetchedMember)! + 1
+          } / ${interaction.guild?.memberCount}
+          `,
+        }, 
       ],
     });
   }

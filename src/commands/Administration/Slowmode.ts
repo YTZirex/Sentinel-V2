@@ -118,115 +118,293 @@ export default class Slowmode extends Command {
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
 
-    if (
-      !interaction.guild?.members.me?.permissions.has(
-        PermissionsBitField.Flags.ManageChannels
-      )
-    )
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            "❌ I don't have the `Manage Channels` permission."
-          ),
-        ],
-        ephemeral: true
-      });
+    let guild = await GuildConfig.findOne({ id: interaction.guildId });
 
-    if (rate < 0 || rate > 21600)
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            `❌ You can only set slowmode between 0 seconds and 6 hours.`
-          ),
-        ],
-        ephemeral: true,
-      });
-
-    try {
-      channel.setRateLimitPerUser(rate, reason);
-      interaction.reply({
-        embeds: [
-          new EmbedBuilder()
-            .setColor("Green")
-            .setThumbnail(interaction.guild?.iconURL()!)
-            .setTitle(
-              `🕘 The slowmode has been set to ${rate} seconds in ${channel}.`
-            ),
-        ],
-        ephemeral: true,
-      });
-
-      if (!silent) {
-        interaction.channel
-          ?.send({
-            embeds: [
-              new EmbedBuilder()
-                .setColor("Orange")
-                .setTitle(`🕘 New slowmode !`)
-                .setThumbnail(interaction.guild?.iconURL()!)
-                .addFields(
-                  {
-                    name: "Message rate:",
-                    value: `${rate} seconds`,
-                  },
-                  {
-                    name: "Moderator:",
-                    value: interaction.user.username,
-                  },
-                  {
-                    name: "Channel:",
-                    value: `${channel}`,
-                  }
-                ),
-            ],
-          })
-          .then((x) => x.react("🕘"));
-      }
-
-      const guild = await GuildConfig.findOne({ id: interaction.guildId });
+    if (guild && guild.language) {
+      reason =
+        interaction.options.getString("reason") ||
+        `${
+          guild.language === "fr"
+            ? "Aucune raison fournie."
+            : "No reason was provived."
+        }`;
 
       if (
-        guild &&
-        guild?.logs?.moderation?.enabled &&
-        guild?.logs?.moderation?.channelId
-      ) {
-        (
-          (await interaction.guild?.channels.fetch(
-            guild?.logs?.moderation?.channelId
-          )) as TextChannel
-        ).send({
+        !interaction.guild?.members.me?.permissions.has(
+          PermissionsBitField.Flags.ManageChannels
+        )
+      )
+        return interaction.reply({
           embeds: [
-            new EmbedBuilder()
-              .setColor("Orange")
-              .setTitle(`🕘 New slowmode !`)
-              .setThumbnail(interaction.guild?.iconURL()!)
-              .addFields(
-                {
-                  name: "Message rate:",
-                  value: `${rate} seconds`,
-                },
-                {
-                  name: "Moderator:",
-                  value: interaction.user.username,
-                },
-                {
-                  name: "Channel:",
-                  value: `${channel}`,
-                }
-              ),
+            {
+              color: 0xff6666,
+              description: `${
+                guild.language === "fr"
+                  ? "❌ Je n'ai pas la permission **Manage Channels**."
+                  : `❌ I don't have the **Manage Channels** permission.`
+              }`,
+              title: `${guild.language === "fr" ? "Oups!" : "Oops!"}`,
+            },
           ],
-        }).then((x) => x.react('🕘'))
+          ephemeral: true,
+        });
+
+      if (rate < 0 || rate > 21600)
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              description: `${
+                guild.language === "fr"
+                  ? "❌ Le slowmode peut seulement être entre 0 secondes et 6 heures."
+                  : `❌ You can only set slowmode between 0 seconds and 6 hours.`
+              }`,
+              title: `${guild.language === "fr" ? "Oups!" : "Oops!"}`,
+            },
+          ],
+          ephemeral: true,
+        });
+
+      try {
+        channel.setRateLimitPerUser(rate, reason);
+        interaction.reply({
+          embeds: [
+            {
+              color: 0x33cc99,
+              thumbnail: { url: interaction.guild?.iconURL()! },
+              title: `${
+                guild.language === "fr"
+                  ? `🕘 Le slowmode est maintenant de ${rate} seconds dans ${channel}.`
+                  : `🕘 The slowmode has been set to ${rate} seconds in ${channel}.`
+              }`,
+            },
+          ],
+          ephemeral: true,
+        });
+
+        if (!silent) {
+          interaction.channel
+            ?.send({
+              embeds: [
+                {
+                  color: 0xff6633,
+                  title: `${
+                    guild.language === "fr"
+                      ? "🕘 Nouveau slowmode !"
+                      : "🕘 New slowmode !"
+                  }`,
+                  thumbnail: { url: interaction.guild?.iconURL()! },
+                  fields: [
+                    {
+                      name: `${
+                        guild.language === "fr"
+                          ? "Délai d'attente:"
+                          : "Message rate:"
+                      }`,
+                      value: `${rate} seconds`,
+                    },
+                    {
+                      name: `${
+                        guild.language === "fr" ? "Modérateur:" : "Moderator:"
+                      }`,
+                      value: interaction.user.username,
+                    },
+                    {
+                      name: `${
+                        guild.language === "fr" ? "Salon:" : "Channel:"
+                      }`,
+                      value: `${channel}`,
+                    },
+                  ],
+                },
+              ],
+            })
+            .then((x) => x.react("🕘"));
+        }
+
+        if (
+          guild &&
+          guild?.logs?.moderation?.enabled &&
+          guild?.logs?.moderation?.channelId
+        ) {
+          (
+            (await interaction.guild?.channels.fetch(
+              guild?.logs?.moderation?.channelId
+            )) as TextChannel
+          )
+            .send({
+              embeds: [
+                {
+                  color: 0xff6633,
+                  title: `${
+                    guild.language === "fr"
+                      ? "🕘 Nouveau slowmode !"
+                      : "🕘 New slowmode !"
+                  }`,
+                  thumbnail: { url: interaction.guild?.iconURL()! },
+                  fields: [
+                    {
+                      name: `${
+                        guild.language === "fr"
+                          ? "Délai d'attente:"
+                          : "Message rate:"
+                      }`,
+                      value: `${rate} seconds`,
+                    },
+                    {
+                      name: `${
+                        guild.language === "fr" ? "Modérateur:" : "Moderator:"
+                      }`,
+                      value: interaction.user.username,
+                    },
+                    {
+                      name: `${
+                        guild.language === "fr" ? "Salon:" : "Channel:"
+                      }`,
+                      value: `${channel}`,
+                    },
+                  ],
+                },
+              ],
+            })
+            .then((x) => x.react("🕘"));
+        }
+      } catch (err) {
+        console.log(err);
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              description: `${
+                guild.language === "fr"
+                  ? "❌ Une erreur est survenue en essayant de changer le slowmode."
+                  : "❌ An error occured while trying to set the slowmode."
+              }`,
+              title: `${guild.language === "fr" ? "Oups!" : "Oops!"}`,
+            },
+          ],
+          ephemeral: true,
+        });
       }
-    } catch (err) {
-      console.log(err);
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            "❌ An error occured while trying to set the slowmode."
-          ),
-        ],
-        ephemeral: true,
-      });
+    } else {
+      if (
+        !interaction.guild?.members.me?.permissions.has(
+          PermissionsBitField.Flags.ManageChannels
+        )
+      )
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              description: `❌ I don't have the **Manage Channels** permission.`,
+              title: "Oops!",
+            },
+          ],
+          ephemeral: true,
+        });
+
+      if (rate < 0 || rate > 21600)
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              description: `❌ You can only set slowmode between 0 seconds and 6 hours.`,
+              title: "Oops!",
+            },
+          ],
+          ephemeral: true,
+        });
+
+      try {
+        channel.setRateLimitPerUser(rate, reason);
+        interaction.reply({
+          embeds: [
+            {
+              color: 0x33cc99,
+              thumbnail: { url: interaction.guild?.iconURL()! },
+              title: `🕘 The slowmode has been set to ${rate} seconds in ${channel}.`,
+            },
+          ],
+          ephemeral: true,
+        });
+
+        if (!silent) {
+          interaction.channel
+            ?.send({
+              embeds: [
+                {
+                  color: 0xff6633,
+                  title: "🕘 New slowmode !",
+                  thumbnail: { url: interaction.guild?.iconURL()! },
+                  fields: [
+                    {
+                      name: "Message rate:",
+                      value: `${rate} seconds`,
+                    },
+                    {
+                      name: "Moderator:",
+                      value: interaction.user.username,
+                    },
+                    {
+                      name: "Channel:",
+                      value: `${channel}`,
+                    },
+                  ],
+                },
+              ],
+            })
+            .then((x) => x.react("🕘"));
+        }
+
+        if (
+          guild &&
+          guild?.logs?.moderation?.enabled &&
+          guild?.logs?.moderation?.channelId
+        ) {
+          (
+            (await interaction.guild?.channels.fetch(
+              guild?.logs?.moderation?.channelId
+            )) as TextChannel
+          )
+            .send({
+              embeds: [
+                {
+                  color: 0xff6633,
+                  title: "🕘 New slowmode !",
+                  thumbnail: { url: interaction.guild?.iconURL()! },
+                  fields: [
+                    {
+                      name: "Message rate:",
+                      value: `${rate} seconds`,
+                    },
+                    {
+                      name: "Moderator:",
+                      value: interaction.user.username,
+                    },
+                    {
+                      name: "Channel:",
+                      value: `${channel}`,
+                    },
+                  ],
+                },
+              ],
+            })
+            .then((x) => x.react("🕘"));
+        }
+      } catch (err) {
+        console.log(err);
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              description:
+                "❌ An error occured while trying to set the slowmode.",
+              title: "Oops!",
+            },
+          ],
+          ephemeral: true,
+        });
+      }
     }
   }
 }

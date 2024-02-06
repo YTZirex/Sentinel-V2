@@ -18,33 +18,30 @@ export default class LanguageSet extends SubCommand {
     let chosenLanguage = interaction.options.getString("language");
 
     let errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
-
+    let guild = await GuildConfig.findOne({
+      id: interaction.guildId,
+    });
     await interaction.deferReply({
       ephemeral: true,
     });
 
     if (chosenLanguage === "fr" || chosenLanguage === "en") {
       try {
-        let guild = await GuildConfig.findOne({
-          id: interaction.guildId,
-        });
-
         if (!guild)
           guild = await GuildConfig.create({ id: interaction.guildId });
         guild.language = chosenLanguage;
         await guild.save();
         interaction.editReply({
           embeds: [
-            new EmbedBuilder()
-              .setColor("Green")
-              .setTitle(`${chosenLanguage === "fr" ? "Succès!" : "Success!"}`)
-              .setDescription(
-                `✅ ${
-                  chosenLanguage === "fr"
-                    ? "Le bot est maintenant en **Français** !"
-                    : "The bot is now in **English** !"
-                }`
-              ),
+            {
+              color: 0x33cc99,
+              title: `${chosenLanguage === "fr" ? "Succès!" : "Success!"}`,
+              description: `✅ ${
+                chosenLanguage === "fr"
+                  ? "Le bot est maintenant en **Français** !"
+                  : "The bot is now in **English** !"
+              }`,
+            },
           ],
         });
         try {
@@ -60,27 +57,19 @@ export default class LanguageSet extends SubCommand {
                 )) as TextChannel
               ).send({
                 embeds: [
-                  new EmbedBuilder()
-                    .setColor("Yellow")
-                    .setThumbnail(interaction.guild?.iconURL()!)
-                    .setTitle(
-                      `${
-                        chosenLanguage === "fr"
-                          ? "Nouvelle langue définie !"
-                          : "New language defined !"
-                      }`
-                    )
-                    .setDescription(
-                      `${
-                        chosenLanguage === "fr"
-                          ? "Le bot est maintenant en **Français** !"
-                          : "The bot is now in **English** !"
-                      }`
-                    )
-                    .setAuthor({
+                  {
+                    color: 0xff6633,
+                    thumbnail: { url: interaction.guild?.iconURL()! },
+                    title:                       `${
+                      chosenLanguage === "fr"
+                        ? "Nouvelle langue définie !"
+                        : "New language defined !"
+                    }`,
+                    author: {
                       name: interaction.user.username,
-                      iconURL: interaction.user.displayAvatarURL(),
-                    }),
+                      icon_url: interaction.user.displayAvatarURL(),
+                    }
+                  }
                 ],
               });
               return;
@@ -90,38 +79,75 @@ export default class LanguageSet extends SubCommand {
           console.log(err);
         }
       } catch (err) {
-        return interaction.editReply({
-          embeds: [
-            errorEmbed.setDescription(
-              "❌ An error occured while updating the database. Please try again."
-            ),
-          ],
-        });
+        if (guild && guild.language) {
+          return interaction.editReply({
+            embeds: [
+              {
+                color: 0xff6666,
+                title: `${guild.language === "fr" ? "Oups!" : "Oops!"}`,
+                description: `${
+                  guild.language === "fr"
+                    ? "❌ Une erreur est survenue en mettant à jour la base de donnée. Veuillez réessayer."
+                    : "❌ An error occured while updating the database. Please try again."
+                }`,
+              },
+            ],
+          });
+        } else {
+          return interaction.editReply({
+            embeds: [
+              {
+                color: 0xff6666,
+                title: "Oops!",
+                description:
+                  "❌ An error occured while trying to update the database. Please try again.",
+              },
+            ],
+          });
+        }
       }
     } else {
       let guild = await GuildConfig.findOne({ id: interaction.guildId });
       if (guild && guild?.language) {
         interaction.editReply({
           embeds: [
-            errorEmbed
-              .setTitle(`${chosenLanguage === "fr" ? "Oups!" : "Oops!"}`)
-              .setDescription(
-                `${
-                  chosenLanguage === "fr"
-                    ? "❌ Veuillez choisir une langue disponible!"
-                    : "❌ Please choose an available language!"
-                }`
-              ),
+            {
+              title: `${chosenLanguage === "fr" ? "Oups!" : "Oops!"}`,
+              description: `${
+                chosenLanguage === "fr"
+                  ? "❌ Veuillez choisir une langue disponible!"
+                  : "❌ Please choose an available language!"
+              }`,
+              color: 0xff6666,
+            },
           ],
         });
       } else {
-        return interaction.editReply({
-          embeds: [
-            errorEmbed.setDescription(
-              `❌ Please choose an available language !`
-            ),
-          ],
-        });
+        if (guild && guild.language) {
+          return interaction.editReply({
+            embeds: [
+              {
+                color: 0xff6666,
+                title: `${guild.language === "fr" ? "Oups!" : "Oops!"}`,
+                description: `${
+                  guild.language === "fr"
+                    ? "❌ Veuillez choisir une langue disponible !"
+                    : "❌ Please choose an avaialble language !"
+                }`,
+              },
+            ],
+          });
+        } else {
+          return interaction.editReply({
+            embeds: [
+              {
+                color: 0xff6666,
+                title: "Oops!",
+                description: "❌ Please choose an available language!",
+              },
+            ],
+          });
+        }
       }
     }
   }

@@ -30,7 +30,7 @@ export default class Test extends Command {
           type: ApplicationCommandOptionType.Subcommand,
         },
       ],
-      dev: false,
+      dev: true,
     });
   }
   /* Execute(interaction: ChatInputCommandInteraction) {

@@ -63,134 +63,317 @@ export default class Clear extends Command {
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
 
-    if (
-      !interaction.guild?.members.me?.permissions.has(
-        PermissionsBitField.Flags.ManageMessages
-      )
-    )
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            "❌ I don't have the `Manage Messages` permission."
-          ),
-        ],
-        ephemeral: true
-      });
-
-    if (amount < 1 || amount > 100)
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            `❌ You can only delete between 1 and 100 messages at a time.`
-          ),
-        ],
-        ephemeral: true,
-      });
-
-    const messages: Collection<
-      string,
-      Message<true>
-    > = await channel.messages.fetch({ limit: 100 });
-
-    var filteredMessages = target
-      ? messages.filter((m) => m.author.id === target.id)
-      : messages;
-    let deleted = 0;
-
-    try {
-      deleted = (
-        await channel.bulkDelete(
-          Array.from(filteredMessages.keys()).slice(0, amount),
-          true
-        )
-      ).size;
-    } catch (err) {
-      console.log(err);
-      return interaction.reply({
-        embeds: [
-          errorEmbed.setDescription(
-            `❌ An error occured while trying to delete the messages !`
-          ),
-        ],
-        ephemeral: true,
-      });
-    }
-
-    interaction.reply({
-      embeds: [
-        new EmbedBuilder()
-          .setColor("Orange")
-          .setTitle(
-            `🧹 Deleted **${deleted}** messages${
-              target ? ` from ${target}` : ``
-            } in ${channel}`
-          ),
-      ],
-      ephemeral: true,
-    });
-
     let guild = await GuildConfig.findOne({ id: interaction.guildId });
 
-    if (
-      guild &&
-      guild?.logs?.moderation?.enabled &&
-      guild?.logs?.moderation?.channelId
-    ) {
-      (
-        (await interaction.guild?.channels.fetch(
-          guild?.logs?.moderation?.channelId
-        )) as TextChannel
+    if (guild && guild.language) {
+      if (
+        !interaction.guild?.members.me?.permissions.has(
+          PermissionsBitField.Flags.ManageMessages
+        )
       )
-        .send({
+        return interaction.reply({
           embeds: [
-            new EmbedBuilder()
-              .setColor("Orange")
-              .setTitle(`🧹 Messages deleted !`)
-              .setThumbnail(interaction.guild?.iconURL()!)
-              .addFields(
-                {
-                  name: "Amount:",
-                  value: `${deleted}`,
-                },
-                {
-                  name: "Moderator:",
-                  value: interaction.user.username,
-                },
-                {
-                  name: "Channel:",
-                  value: `${channel}`,
-                }
-              ),
+            {
+              color: 0xff6666,
+              title: `${guild.language === "fr" ? "Oups!" : "Oops!"}`,
+              description: `${
+                guild.language === "fr"
+                  ? "❌ Je n'ai pas la permission **Manage Messages**."
+                  : "❌ I don't have the `Manage Messages` permission."
+              }`,
+            },
           ],
-        })
-        .then((x) => x.react("🧹"));
-    }
+          ephemeral: true,
+        });
 
-    if (!silent) {
-      channel
-        .send({
+      if (amount < 1 || amount > 100)
+        return interaction.reply({
           embeds: [
-            new EmbedBuilder()
-              .setColor("Orange")
-              .setTitle(`🧹 Messages deleted !`)
-              .setThumbnail(interaction.guild?.iconURL()!)
-              .addFields(
-                {
-                  name: "Amount:",
-                  value: `${deleted}`,
-                },
-                {
-                  name: "Moderator:",
-                  value: interaction.user.username,
-                },
-                {
-                  name: "Channel:",
-                  value: `${channel}`,
-                }
-              ),
+            {
+              color: 0xff6666,
+              title: `${guild.language === "fr" ? "Oups!" : "Oops!"}`,
+              description: `${
+                guild.language === "fr"
+                  ? `❌ Vous pouvez seulement supprimer entre 1 et 100 messages à la fois.`
+                  : `❌ You can only delete between 1 and 100 messages at a time.`
+              }`,
+            },
           ],
-        })
-        .then((x) => x.react("🧹"));
-    }
+          ephemeral: true,
+        });
+
+      const messages: Collection<
+        string,
+        Message<true>
+      > = await channel.messages.fetch({ limit: 100 });
+
+      var filteredMessages = target
+        ? messages.filter((m) => m.author.id === target.id)
+        : messages;
+      let deleted = 0;
+
+      try {
+        deleted = (
+          await channel.bulkDelete(
+            Array.from(filteredMessages.keys()).slice(0, amount),
+            true
+          )
+        ).size;
+      } catch (err) {
+        console.log(err);
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              title: `${guild.language === "fr" ? "Oups!" : "Oops!"}`,
+              description: `${
+                guild.language === "fr"
+                  ? `❌ Une erreur est survenue en essayant de supprimer les messages !`
+                  : `❌ An error occured while trying to delete the messages !`
+              }`,
+            },
+          ],
+          ephemeral: true,
+        });
+      }
+
+      interaction.reply({
+        embeds: [
+          {
+            color: 0xff6633,
+            title: `${
+              guild.language === "fr"
+                ? `🧹 J'ai supprimé **${deleted}** messages${
+                    target ? ` de ${target}` : ``
+                  } dans ${channel} !`
+                : `🧹 Deleted **${deleted}** messages${
+                    target ? ` from ${target}` : ``
+                  } in ${channel} !`
+            }`,
+          },
+        ],
+        ephemeral: true,
+      });
+
+      if (
+        guild &&
+        guild?.logs?.moderation?.enabled &&
+        guild?.logs?.moderation?.channelId
+      ) {
+        (
+          (await interaction.guild?.channels.fetch(
+            guild?.logs?.moderation?.channelId
+          )) as TextChannel
+        )
+          .send({
+            embeds: [
+              {
+                color: 0xff6633,
+                title: `${
+                  guild.language === "fr"
+                    ? "🧹 Messages supprimés !"
+                    : "🧹 Messages deleted !"
+                }`,
+                thumbnail: { url: interaction.guild?.iconURL()! },
+                fields: [
+                  {
+                    name: `${
+                      guild.language === "fr" ? "Quantité:" : "Amount:"
+                    }`,
+                    value: `${deleted}`,
+                  },
+                  {
+                    name: `${
+                      guild.language === "fr" ? "Modérateur:" : "Moderator:"
+                    }`,
+                    value: interaction.user.username,
+                  },
+                  {
+                    name: `${guild.language === "fr" ? "Salon:" : "Channel:"}`,
+                    value: `${channel}`,
+                  },
+                ],
+              },
+            ],
+          })
+          .then((x) => x.react("🧹"));
+      }
+
+      if (!silent) {
+        channel
+          .send({
+            embeds: [
+              {
+                color: 0xff6633,
+                title: `${
+                  guild.language === "fr"
+                    ? "🧹 Messages supprimés !"
+                    : "🧹 Messages deleted !"
+                }`,
+                thumbnail: {
+                  url: interaction.guild?.iconURL()!,
+                },
+                fields: [
+                  {
+                    name: `${
+                      guild.language === "fr" ? "Quantité:" : "Amount:"
+                    }`,
+                    value: `${deleted}`,
+                  },
+                  {
+                    name: `${
+                      guild.language === "fr" ? "Modérateur:" : "Moderator:"
+                    }`,
+                    value: interaction.user.username,
+                  },
+                  {
+                    name: `${guild.language === "fr" ? "Salon:" : "Channel:"}`,
+                    value: `${channel}`,
+                  },
+                ],
+              },
+            ],
+          })
+          .then((x) => x.react("🧹"));
+      }
+    } else {
+      // DONT CHANGE DONT CHANGE DONT CHANGE
+      if (
+        !interaction.guild?.members.me?.permissions.has(
+          PermissionsBitField.Flags.ManageMessages
+        )
+      )
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              title: "Oops!",
+              description: "❌ I don't have the `Manage Messages` permission.",
+            },
+          ],
+          ephemeral: true,
+        });
+
+      if (amount < 1 || amount > 100)
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              title: "Oops!",
+              description: `❌ You can only delete between 1 and 100 messages at a time.`,
+            },
+          ],
+          ephemeral: true,
+        });
+
+      const messages: Collection<
+        string,
+        Message<true>
+      > = await channel.messages.fetch({ limit: 100 });
+
+      var filteredMessages = target
+        ? messages.filter((m) => m.author.id === target.id)
+        : messages;
+      let deleted = 0;
+
+      try {
+        deleted = (
+          await channel.bulkDelete(
+            Array.from(filteredMessages.keys()).slice(0, amount),
+            true
+          )
+        ).size;
+      } catch (err) {
+        console.log(err);
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              title: "Oops!",
+              description: `❌ An error occured while trying to delete the messages !`,
+            },
+          ],
+          ephemeral: true,
+        });
+      }
+
+      interaction.reply({
+        embeds: [
+          {
+            color: 0xff6633,
+            title: `🧹 Deleted **${deleted}** messages${
+              target ? ` from ${target}` : ``
+            } in ${channel}`,
+          },
+        ],
+        ephemeral: true,
+      });
+
+      if (
+        guild &&
+        guild?.logs?.moderation?.enabled &&
+        guild?.logs?.moderation?.channelId
+      ) {
+        (
+          (await interaction.guild?.channels.fetch(
+            guild?.logs?.moderation?.channelId
+          )) as TextChannel
+        )
+          .send({
+            embeds: [
+              {
+                color: 0xff6633,
+                title: `🧹 Messages deleted !`,
+                thumbnail: { url: interaction.guild?.iconURL()! },
+                fields: [
+                  {
+                    name: "Amount:",
+                    value: `${deleted}`,
+                  },
+                  {
+                    name: "Moderator:",
+                    value: interaction.user.username,
+                  },
+                  {
+                    name: "Channel:",
+                    value: `${channel}`,
+                  },
+                ],
+              },
+            ],
+          })
+          .then((x) => x.react("🧹"));
+      }
+
+      if (!silent) {
+        channel
+          .send({
+            embeds: [
+              {
+                color: 0xff6633,
+                title: "🧹 Messages deleted !",
+                thumbnail: {
+                  url: interaction.guild?.iconURL()!,
+                },
+                fields: [
+                  {
+                    name: "Amount:",
+                    value: `${deleted}`,
+                  },
+                  {
+                    name: "Moderator:",
+                    value: interaction.user.username,
+                  },
+                  {
+                    name: "Channel:",
+                    value: `${channel}`,
+                  },
+                ],
+              },
+            ],
+          })
+          .then((x) => x.react("🧹"));
+      }
+    } // DONT CHANGE DONT CHANGE DONT CHANGE
   }
 }
