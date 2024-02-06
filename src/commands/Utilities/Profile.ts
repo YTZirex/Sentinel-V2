@@ -42,6 +42,7 @@ export default class Profile extends Command {
     const buffer = await profileImage(target.id, {
       //borderColor: ["#000000", "#ffffff"],
       badgesFrame: true,
+      backgroundBrightness: 100,
       removeAvatarFrame: false,
       moreBackgroundBlur: true,
       // customBackground: 'https://i.imgur.com/LWcWzlc.png',

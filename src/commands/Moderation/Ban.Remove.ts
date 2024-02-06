@@ -3,6 +3,7 @@ import {
   EmbedBuilder,
   GuildMember,
   GuildMemberRoleManager,
+  PermissionsBitField,
   TextChannel,
 } from "discord.js";
 import CustomClient from "../../base/classes/CustomClient";
@@ -22,6 +23,20 @@ export default class BanRemove extends SubCommand {
     const silent = interaction.options.getBoolean("silent") || false;
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle(`Oops!`);
+
+    if (
+      !interaction.guild?.members.me?.permissions.has(
+        PermissionsBitField.Flags.BanMembers
+      )
+    )
+      return interaction.reply({
+        embeds: [
+          errorEmbed.setDescription(
+            "❌ I don't have the `Ban Members` permission."
+          ),
+        ],
+        ephemeral: true
+      });
 
     if (reason.length > 512)
       return interaction.reply({
@@ -44,77 +59,76 @@ export default class BanRemove extends SubCommand {
 
     try {
       await interaction.guild?.bans.remove(target!, reason);
-      
-    interaction.reply({
-      embeds: [
-        new EmbedBuilder()
-          .setTitle(`🔨 Successssfully unbanned ${target}!`)
-          .setColor("Green"),
-      ],
-      ephemeral: true,
-    });
 
-    if (!silent) {
-      interaction.channel
-        ?.send({
-          embeds: [
-            new EmbedBuilder()
-              .setColor("Green")
-              .setTitle(`🔨 Successfully unbanned the user!`)
-              .addFields(
-                {
-                  name: "Target:",
-                  value: target!,
-                },
-                {
-                  name: "Moderator:",
-                  value: interaction.user.username,
-                },
-                {
-                  name: "Reason:",
-                  value: reason,
-                }
-              ),
-          ],
-        })
-        .then(async (x) => await x.react("🔨"));
-    }
-    const guild = await GuildConfig.findOne({ id: interaction.guildId });
+      interaction.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle(`🔨 Successssfully unbanned ${target}!`)
+            .setColor("Green"),
+        ],
+        ephemeral: true,
+      });
 
-    if (
-      guild &&
-      guild?.logs?.moderation?.enabled &&
-      guild?.logs?.moderation?.channelId
-    ) {
-      (
-        (await interaction.guild?.channels.fetch(
-          guild.logs.moderation.channelId
-        )) as TextChannel
-      )
-        .send({
-          embeds: [
-            new EmbedBuilder()
-              .setColor("Green")
-              .setTitle(`🔨 A user has been unbanned!`)
-              .addFields(
-                {
-                  name: "Target:",
-                  value: target!,
-                },
-                {
-                  name: "Moderator:",
-                  value: interaction.user.username,
-                },
-                {
-                  name: "Reason:",
-                  value: reason,
-                }
-              ),
-          ],
-        })
-        .then(async (x) => x.react("🔨"));
-    }
-    
+      if (!silent) {
+        interaction.channel
+          ?.send({
+            embeds: [
+              new EmbedBuilder()
+                .setColor("Green")
+                .setTitle(`🔨 Successfully unbanned the user!`)
+                .addFields(
+                  {
+                    name: "Target:",
+                    value: target!,
+                  },
+                  {
+                    name: "Moderator:",
+                    value: interaction.user.username,
+                  },
+                  {
+                    name: "Reason:",
+                    value: reason,
+                  }
+                ),
+            ],
+          })
+          .then(async (x) => await x.react("🔨"));
+      }
+      const guild = await GuildConfig.findOne({ id: interaction.guildId });
+
+      if (
+        guild &&
+        guild?.logs?.moderation?.enabled &&
+        guild?.logs?.moderation?.channelId
+      ) {
+        (
+          (await interaction.guild?.channels.fetch(
+            guild.logs.moderation.channelId
+          )) as TextChannel
+        )
+          .send({
+            embeds: [
+              new EmbedBuilder()
+                .setColor("Green")
+                .setTitle(`🔨 A user has been unbanned!`)
+                .addFields(
+                  {
+                    name: "Target:",
+                    value: target!,
+                  },
+                  {
+                    name: "Moderator:",
+                    value: interaction.user.username,
+                  },
+                  {
+                    name: "Reason:",
+                    value: reason,
+                  }
+                ),
+            ],
+          })
+          .then(async (x) => x.react("🔨"));
+      }
     } catch (err) {
       return interaction.reply({
         embeds: [
@@ -125,6 +139,5 @@ export default class BanRemove extends SubCommand {
       });
       console.log(err);
     }
-
   }
 }

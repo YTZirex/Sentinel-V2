@@ -7,4 +7,5 @@ export default interface IConfig {
   devClientId: string;
   devMongoURI: string;
   mongoURI: string;
+  botVersion: string;
 }

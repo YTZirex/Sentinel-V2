@@ -118,6 +118,20 @@ export default class Slowmode extends Command {
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
 
+    if (
+      !interaction.guild?.members.me?.permissions.has(
+        PermissionsBitField.Flags.ManageChannels
+      )
+    )
+      return interaction.reply({
+        embeds: [
+          errorEmbed.setDescription(
+            "❌ I don't have the `Manage Channels` permission."
+          ),
+        ],
+        ephemeral: true
+      });
+
     if (rate < 0 || rate > 21600)
       return interaction.reply({
         embeds: [

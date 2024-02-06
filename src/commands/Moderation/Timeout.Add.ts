@@ -5,6 +5,7 @@ import {
   EmbedBuilder,
   GuildMemberRoleManager,
   TextChannel,
+  PermissionsBitField,
 } from "discord.js";
 import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
@@ -26,6 +27,20 @@ export default class TimeoutAdd extends SubCommand {
     const msDuration = ms(duration);
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle(`Oops!`);
+
+    if (
+      !interaction.guild?.members.me?.permissions.has(
+        PermissionsBitField.Flags.ModerateMembers
+      )
+    )
+      return interaction.reply({
+        embeds: [
+          errorEmbed.setDescription(
+            "❌ I don't have the `Moderate Members` permission."
+          ),
+        ],
+        ephemeral: true
+      });
 
     if (!target)
       return interaction.reply({

@@ -63,6 +63,20 @@ export default class Clear extends Command {
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
 
+    if (
+      !interaction.guild?.members.me?.permissions.has(
+        PermissionsBitField.Flags.ManageMessages
+      )
+    )
+      return interaction.reply({
+        embeds: [
+          errorEmbed.setDescription(
+            "❌ I don't have the `Manage Messages` permission."
+          ),
+        ],
+        ephemeral: true
+      });
+
     if (amount < 1 || amount > 100)
       return interaction.reply({
         embeds: [

@@ -53,6 +53,20 @@ export default class Kick extends Command {
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle(`Oops!`);
 
+    if (
+      !interaction.guild?.members.me?.permissions.has(
+        PermissionsBitField.Flags.KickMembers
+      )
+    )
+      return interaction.reply({
+        embeds: [
+          errorEmbed.setDescription(
+            "❌ I don't have the `Kick Members` permission."
+          ),
+        ],
+        ephemeral: true
+      });
+
     if (!target)
       return interaction.reply({
         embeds: [errorEmbed.setDescription(`❌ Please provide a valid user.`)],

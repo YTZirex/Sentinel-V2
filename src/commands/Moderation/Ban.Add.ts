@@ -3,6 +3,7 @@ import {
   EmbedBuilder,
   GuildMember,
   GuildMemberRoleManager,
+  PermissionsBitField,
   TextChannel,
 } from "discord.js";
 import CustomClient from "../../base/classes/CustomClient";
@@ -23,6 +24,20 @@ export default class BanAdd extends SubCommand {
     const silent = interaction.options.getBoolean("silent") || false;
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle(`Oops!`);
+
+    if (
+      !interaction.guild?.members.me?.permissions.has(
+        PermissionsBitField.Flags.BanMembers
+      )
+    )
+      return interaction.reply({
+        embeds: [
+          errorEmbed.setDescription(
+            "❌ I don't have the `Ban Members` permission."
+          ),
+        ],
+        ephemeral: true
+      });
 
     if (!target)
       return interaction.reply({
