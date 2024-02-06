@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 
 interface IGuildConfig {
   id: string;
+  language: string;
   logs: {
     moderation: {
       enabled: boolean;
@@ -15,6 +16,7 @@ export default model<IGuildConfig>(
   new Schema<IGuildConfig>(
     {
       id: String,
+      language: String,
       logs: {
         moderation: {
           enabled: Boolean,

@@ -51,11 +51,16 @@ export default class BotInfo extends Command {
                 > **Node Version:** ${process.version}
                 > **Bot Version:** ${this.config.botVersion}
                 > **Dependencies:** ${Object.keys(dependencies).length}
+                > **Uptime:** ${this.uptimeString(Math.floor(process.uptime()))}
 
                 __**Guild Info**__
                 > **Total Guilds:** ${(await this.client.guilds.fetch()).size}
+                > **Total Members:** ${this.client.guilds.cache
+                  .map((guild) => guild.memberCount)
+                  .reduce((a, b) => a + b, 0)}
+                > **Total Channels:** ${await this.client.channels.cache.size}
 
-                __**System Info**_
+                __**System Info**__
                 > **Operating System:** ${process.platform}
                 > **CPU:** ${os.cpus()[0].model.trim()}
                 > **RAM Usage:** ${this.formatBytes(
@@ -63,8 +68,8 @@ export default class BotInfo extends Command {
                 )} / ${this.formatBytes(os.totalmem())}
 
                 __**Development Team:**__
-                > **Creators**: Fadzuk, Matt,
-                > **Developers:** Matt,
+                > **Creators**: Fadzuk, Matt
+                > **Developers:** Matt
                 `),
       ],
       components: [
@@ -73,7 +78,8 @@ export default class BotInfo extends Command {
             .setLabel(`Invite me!`)
             .setStyle(ButtonStyle.Link)
             .setURL(
-              "https://discord.com/api/oauth2/authorize?client_id=1203014293549744189&permissions=70368744177655&scope=applications.commands+bot"),
+              "https://discord.com/api/oauth2/authorize?client_id=1203014293549744189&permissions=70368744177655&scope=applications.commands+bot"
+            ),
           new ButtonBuilder()
             .setLabel("Support Server")
             .setStyle(ButtonStyle.Link)
@@ -90,5 +96,18 @@ export default class BotInfo extends Command {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
 
     return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
+  }
+
+  private uptimeString(seconds: number) {
+    // eslint-disable-next-line prefer-const
+    let days = Math.floor(seconds / (3600 * 24));
+    seconds -= days * 3600 * 24;
+    // eslint-disable-next-line prefer-const
+    let hours = Math.floor(seconds / 3600);
+    seconds -= hours * 3600;
+    // eslint-disable-next-line prefer-const
+    let minutes = Math.floor(seconds / 60);
+    seconds -= minutes * 60;
+    return `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
   }
 }
