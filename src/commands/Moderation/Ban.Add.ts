@@ -9,6 +9,7 @@ import {
 import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class BanAdd extends SubCommand {
   constructor(client: CustomClient) {
@@ -22,6 +23,10 @@ export default class BanAdd extends SubCommand {
       interaction.options.getString("reason") || "No reason was provided.";
     const messages: number = interaction.options.getInteger("messages") || 0;
     const silent = interaction.options.getBoolean("silent") || false;
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.ban.banAdd.used += 1;
+    await commandCounter?.save();
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle(`Oops!`);
 

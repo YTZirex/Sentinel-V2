@@ -11,6 +11,7 @@ import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import ms from "ms";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class TimeoutAdd extends SubCommand {
   constructor(client: CustomClient) {
@@ -25,6 +26,10 @@ export default class TimeoutAdd extends SubCommand {
       interaction.options.getString("reason") || "No reason was provided.";
     const silent = interaction.options.getBoolean("silent") || false;
     const msDuration = ms(duration);
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.timeout.timeoutAdd.used += 1;
+    await commandCounter?.save();
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle(`Oops!`);
 

@@ -3,6 +3,7 @@ import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import GuildConfig from "../../base/schemas/GuildConfig";
 import Economy from "../../base/schemas/Economy";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class AccountDelete extends SubCommand {
   constructor(client: CustomClient) {
@@ -17,7 +18,11 @@ export default class AccountDelete extends SubCommand {
       id: interaction.guildId,
     });
 
-    let economy = Economy.findOne({
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.account.accountDelete.used += 1;
+    await commandCounter?.save();
+
+    let economy = await Economy.findOne({
       user: interaction.user.id,
     });
 
@@ -49,6 +54,7 @@ export default class AccountDelete extends SubCommand {
           ],
           ephemeral: true,
         });
+        return;
       } else {
         let tempEconomy = await Economy.findOne({ user: interaction.user.id });
         try {

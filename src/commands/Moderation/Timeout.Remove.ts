@@ -9,6 +9,7 @@ import {
 import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class TimeoutRemove extends SubCommand {
   constructor(client: CustomClient) {
@@ -24,6 +25,10 @@ export default class TimeoutRemove extends SubCommand {
     const silent = interaction.options.getBoolean("silent") || false;
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.timeout.timeoutRemove.used += 1;
+    await commandCounter?.save();
 
     if (guild && guild?.language) {
       reason =

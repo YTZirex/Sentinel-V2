@@ -10,6 +10,7 @@ import Command from "../../base/classes/Command";
 import CustomClient from "../../base/classes/CustomClient";
 import Category from "../../base/enums/Category";
 import { profileImage } from "discord-arts";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class Profile extends Command {
   constructor(client: CustomClient) {
@@ -36,6 +37,10 @@ export default class Profile extends Command {
   async Execute(interaction: ChatInputCommandInteraction) {
     let target = (interaction.options.getUser("target") ||
       interaction.member) as GuildMember;
+
+      let commandCounter = await CommandCounter.findOne({ global: 1 });
+      commandCounter!.profile.used += 1;
+      await commandCounter?.save();
 
     await interaction.deferReply({ ephemeral: false });
 

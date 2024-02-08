@@ -7,6 +7,7 @@ import {
 import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class LanguageSet extends SubCommand {
   constructor(client: CustomClient) {
@@ -16,6 +17,10 @@ export default class LanguageSet extends SubCommand {
   }
   async Execute(interaction: ChatInputCommandInteraction) {
     let chosenLanguage = interaction.options.getString("language");
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.language.languageSet.used += 1;
+    await commandCounter?.save();
 
     let errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
     let guild = await GuildConfig.findOne({

@@ -10,6 +10,7 @@ import Command from "../../base/classes/Command";
 import CustomClient from "../../base/classes/CustomClient";
 import Category from "../../base/enums/Category";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class Slowmode extends Command {
   constructor(client: CustomClient) {
@@ -115,6 +116,10 @@ export default class Slowmode extends Command {
     let silent = interaction.options.getBoolean("silent") || false;
     let reason =
       interaction.options.getString("reason") || "No reason was provided.";
+
+      let commandCounter = await CommandCounter.findOne({ global: 1 });
+      commandCounter!.slowmode.used += 1;
+      await commandCounter?.save();
 
     const errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
 

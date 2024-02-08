@@ -12,6 +12,7 @@ import Category from "../../base/enums/Category";
 import IConfig from "../../base/interfaces/IConfig";
 import ms from "ms";
 import os from "os";
+import CommandCounter from "../../base/schemas/CommandCounter";
 const { version, dependencies } = require(`${process.cwd()}/package.json`);
 
 export default class BotInfo extends Command {
@@ -36,6 +37,11 @@ export default class BotInfo extends Command {
     \`${Object.keys(dependencies)
           .map((p) => `${p}@${dependencies[p]}`.replace(/\^/g, ""))
           .join(", ")}\`*/
+
+          let commandCounter = await CommandCounter.findOne({ global: 1 });
+          commandCounter!.botInfo.used += 1;
+          await commandCounter?.save();
+
     interaction.reply({
       embeds: [
         {

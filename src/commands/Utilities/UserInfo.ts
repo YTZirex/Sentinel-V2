@@ -8,6 +8,7 @@ import {
 import Command from "../../base/classes/Command";
 import CustomClient from "../../base/classes/CustomClient";
 import Category from "../../base/enums/Category";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class UserInfo extends Command {
   constructor(client: CustomClient) {
@@ -34,6 +35,10 @@ export default class UserInfo extends Command {
   async Execute(interaction: ChatInputCommandInteraction) {
     let target = (interaction.options.getUser("target") ||
       interaction.member) as GuildMember;
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.userInfo.used += 1;
+    await commandCounter?.save();
 
     await interaction.deferReply({ ephemeral: false });
 
@@ -84,7 +89,7 @@ export default class UserInfo extends Command {
             this.GetJoinPosition(interaction, fetchedMember)! + 1
           } / ${interaction.guild?.memberCount}
           `,
-        }, 
+        },
       ],
     });
   }

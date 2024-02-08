@@ -7,6 +7,7 @@ import {
 import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class LogsToggle extends SubCommand {
   constructor(client: CustomClient) {
@@ -17,6 +18,10 @@ export default class LogsToggle extends SubCommand {
   async Execute(interaction: ChatInputCommandInteraction) {
     const logType = interaction.options.getString("log-type");
     const enabled = interaction.options.getBoolean("toggle");
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.logs.logsToggle.used += 1;
+    await commandCounter?.save();
 
     let guild = await GuildConfig.findOne({
       id: interaction.guildId,

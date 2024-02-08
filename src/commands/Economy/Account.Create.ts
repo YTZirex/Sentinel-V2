@@ -3,6 +3,7 @@ import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import Economy from "../../base/schemas/Economy";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class AccountCreate extends SubCommand {
   constructor(client: CustomClient) {
@@ -15,6 +16,10 @@ export default class AccountCreate extends SubCommand {
     let fullname = interaction.options.getString("names");
     let dateOfBirth = interaction.options.getString("date-of-birth");
     let gender = interaction.options.getString("gender");
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.account.accountCreate.used += 1;
+    await commandCounter?.save();
 
     let guild = await GuildConfig.findOne({
       id: interaction.guildId,

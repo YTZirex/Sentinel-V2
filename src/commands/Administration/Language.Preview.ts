@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class LanguagePreview extends SubCommand {
   constructor(client: CustomClient) {
@@ -12,6 +13,10 @@ export default class LanguagePreview extends SubCommand {
   async Execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
     let errorEmbed = new EmbedBuilder().setColor("Red").setTitle("Oops!");
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.language.languagePreview.used += 1;
+    await commandCounter?.save();
 
     try {
       let guild = await GuildConfig.findOne({

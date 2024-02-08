@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, PermissionsBitField } from "discord.js";
 import Command from "../../base/classes/Command";
 import CustomClient from "../../base/classes/CustomClient";
 import Category from "../../base/enums/Category";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class ServerInfo extends Command {
   constructor(client: CustomClient) {
@@ -19,6 +20,11 @@ export default class ServerInfo extends Command {
   }
 
   async Execute(interaction: ChatInputCommandInteraction) {
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.serverInfo.used += 1;
+    await commandCounter?.save();
+
     interaction.reply({
       content: "Command not made yet.",
       ephemeral: true,

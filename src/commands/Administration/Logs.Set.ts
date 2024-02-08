@@ -7,6 +7,7 @@ import {
 import CustomClient from "../../base/classes/CustomClient";
 import SubCommand from "../../base/classes/SubCommand";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class LogsSet extends SubCommand {
   constructor(client: CustomClient) {
@@ -17,6 +18,10 @@ export default class LogsSet extends SubCommand {
   async Execute(interaction: ChatInputCommandInteraction) {
     const logType = interaction.options.getString("log-type");
     const channel = interaction.options.getChannel("channel") as TextChannel;
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.logs.logsSet.used += 1;
+    await commandCounter?.save();
 
     await interaction.deferReply({
       ephemeral: true,
