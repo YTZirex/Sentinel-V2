@@ -9,6 +9,7 @@ import CustomClient from "../../base/classes/CustomClient";
 import Category from "../../base/enums/Category";
 import * as fs from "fs";
 import GuildConfig from "../../base/schemas/GuildConfig";
+import CommandCounter from "../../base/schemas/CommandCounter";
 
 export default class Help extends Command {
   constructor(client: CustomClient) {
@@ -57,6 +58,11 @@ export default class Help extends Command {
     });
 
     let category = interaction.options.getString("category");
+
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+
+    commandCounter!.help.used += 1;
+    await commandCounter?.save();
 
     if (guild && guild.language) {
       if (!category) {
