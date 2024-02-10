@@ -21,7 +21,7 @@ export default class Help extends Command {
       default_member_permissions:
         PermissionsBitField.Flags.UseApplicationCommands,
       cooldown: 3,
-      dev: true,
+      dev: false,
       options: [
         {
           name: "category",
@@ -60,7 +60,6 @@ export default class Help extends Command {
     let category = interaction.options.getString("category");
 
     let commandCounter = await CommandCounter.findOne({ global: 1 });
-
     commandCounter!.help.used += 1;
     await commandCounter?.save();
 
