@@ -24,6 +24,7 @@ export default class Help extends Command {
         {
           name: "category",
           type: ApplicationCommandOptionType.String,
+          required: true,
           choices: [
             {
               name: "Utilities",
@@ -125,7 +126,7 @@ export default class Help extends Command {
               },
               {
                 name: "</clear:1204118823075188806>",
-                value: 'Clears a selected amount of messages in a channel.',
+                value: "Clears a selected amount of messages in a channel.",
               },
             ],
           },
@@ -141,6 +142,24 @@ export default class Help extends Command {
             thumbnail: {
               url: interaction.guild?.iconURL()!,
             },
+            fields: [
+              {
+                name: "</account create:1204810971416236072>",
+                value: "Creates a new bank account.",
+              },
+              {
+                name: "</account delete:1204810971416236072>",
+                value: `Deletes your bank account. We can't undo this action.`,
+              },
+              {
+                name: "</job change:1204854865210245230>",
+                value: `Allows you to change your job.`,
+              },
+              {
+                name: "</job informations:1204854865210245230>",
+                value: `Provides informations about your current job.`,
+              },
+            ],
           },
         ],
       });
@@ -154,6 +173,32 @@ export default class Help extends Command {
             thumbnail: {
               url: interaction.guild?.iconURL()!,
             },
+            fields: [
+              {
+                name: "</announcement:1204456979964108820>",
+                value: `Allows you to create an announcement.`,
+              },
+              {
+                name: "</language set:1204488421976969318>",
+                value: `Allows you to change the bot's language.`,
+              },
+              {
+                name: "</language preview:1204488421976969318>",
+                value: `Allows you to preview the bot's language with an example.`,
+              },
+              {
+                name: "</logs set:1203421654550581281>",
+                value: `Allows you to set the bot's logs settings.`,
+              },
+              {
+                name: "</logs toggle:1203421654550581281>",
+                value: `Allows you to toggle the bot's logs settings.`,
+              },
+              {
+                name: "</slowmode:1204120981912682516>",
+                value: `Allows you to set the slowmode of a channel.`,
+              },
+            ],
           },
         ],
       });
