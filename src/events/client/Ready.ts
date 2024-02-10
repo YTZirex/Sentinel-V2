@@ -51,18 +51,21 @@ export default class Ready extends Event {
       );
     }
 
-    let statuses = [
-      `${client.guilds.cache
-        .map((guild) => guild.memberCount)
-        .reduce((a, b) => a + b, 0)} users!`,
-      `Version ${this.client.config.botVersion}`,
-      `Coming soon to the public!`,
-      `${(await client.guilds.fetch()).size} servers!`,
-    ];
+    let guildsFetchedSize = (await this.client.guilds.fetch()).size;
     // Our pointer
     let i = 0;
     // Every 15 seconds, update the status
     setInterval(() => {
+      let statuses = [
+        `${this.client.guilds.cache
+          .map((guild) => guild.memberCount)
+          .reduce((a, b) => a + b, 0)} users!`,
+        `Version ${this.client.config.botVersion}`,
+        `Released 10/02/2024 9:00PM !`,
+        `${guildsFetchedSize} servers!`,
+        `Online since ${this.uptimeString(Math.floor(process.uptime()))}`,
+      ];
+
       // Get the status
       let status = statuses[i];
       // If it's undefined, it means we reached the end of the array
@@ -76,7 +79,7 @@ export default class Ready extends Event {
         status: "online",
       });
       i++;
-    }, 15000);
+    }, 5000);
   }
 
   private GetJson(commands: Collection<string, Command>): object[] {
@@ -93,5 +96,17 @@ export default class Ready extends Event {
       });
     });
     return data;
+  }
+  private uptimeString(seconds: number) {
+    // eslint-disable-next-line prefer-const
+    let days = Math.floor(seconds / (3600 * 24));
+    seconds -= days * 3600 * 24;
+    // eslint-disable-next-line prefer-const
+    let hours = Math.floor(seconds / 3600);
+    seconds -= hours * 3600;
+    // eslint-disable-next-line prefer-const
+    let minutes = Math.floor(seconds / 60);
+    seconds -= minutes * 60;
+    return `${days}d, ${hours}h, ${minutes}min, ${seconds}s`;
   }
 }
