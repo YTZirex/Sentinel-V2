@@ -51,9 +51,10 @@ export default class Emit extends Command {
 
     interaction.reply({
       embeds: [
-        new EmbedBuilder()
-          .setColor("Green")
-          .setDescription(`✅ Emitted event - \`${event}\``),
+        {
+          color: 0x33cc99,
+          description: `✅ Emitted event - \`${event}\``,
+        },
       ],
       ephemeral: true,
     });
