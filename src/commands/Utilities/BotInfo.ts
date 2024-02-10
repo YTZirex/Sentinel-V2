@@ -70,7 +70,7 @@ export default class BotInfo extends Command {
                 guild.language === "fr"
                   ? "Version DiscordJS"
                   : "DiscordJS Version"
-              }:** ${version}
+              }:** ${dependencies['discord.js']}
               > **${
                 guild.language === "fr" ? "Version Node" : "Node Version"
               }:** ${process.version}
@@ -214,7 +214,7 @@ export default class BotInfo extends Command {
                 this.client.user!.createdTimestamp / 1000
               ).toFixed(0)}:R>
               > **Commands:** ${this.client.commands.size}
-              > **DiscordJS Version:** ${version}
+              > **DiscordJS Version:** ${dependencies['discord.js']}
               > **Node Version:** ${process.version}
               > **Bot Version:** ${this.config.botVersion}
               > **Dependencies:** ${Object.keys(dependencies).length}

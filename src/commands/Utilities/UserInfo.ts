@@ -52,7 +52,7 @@ export default class UserInfo extends Command {
         embeds: [
           {
             //@ts-ignore
-            color: fetchedMember.user.hexAccentColor || 0x6666ff,
+            color: 0x6666ff,
             thumbnail: {
               url: fetchedMember.user.displayAvatarURL({ size: 64 }),
             },
@@ -117,7 +117,7 @@ export default class UserInfo extends Command {
         embeds: [
           {
             //@ts-ignore
-            color: fetchedMember.user.hexAccentColor || 0x6666ff,
+            color: 0x6666ff,
             thumbnail: {
               url: fetchedMember.user.displayAvatarURL({ size: 64 }),
             },
