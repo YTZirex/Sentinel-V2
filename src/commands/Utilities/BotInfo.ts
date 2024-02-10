@@ -70,7 +70,7 @@ export default class BotInfo extends Command {
                 guild.language === "fr"
                   ? "Version DiscordJS"
                   : "DiscordJS Version"
-              }:** ${dependencies['discord.js']}
+              }:** ${dependencies["discord.js"]}
               > **${
                 guild.language === "fr" ? "Version Node" : "Node Version"
               }:** ${process.version}
@@ -170,7 +170,7 @@ export default class BotInfo extends Command {
               {
                 type: 2,
                 style: 5,
-                label: guild.language === "fr" ? "Invite moi!" : "Invite me!",
+                label: guild.language === "fr" ? "Invite moi !" : "Invite me !",
                 url: "https://discord.com/api/oauth2/authorize?client_id=1203014293549744189&permissions=70368744177655&scope=applications.commands+bot",
                 emoji: "🔗",
               },
@@ -214,7 +214,7 @@ export default class BotInfo extends Command {
                 this.client.user!.createdTimestamp / 1000
               ).toFixed(0)}:R>
               > **Commands:** ${this.client.commands.size}
-              > **DiscordJS Version:** ${dependencies['discord.js']}
+              > **DiscordJS Version:** ${dependencies["discord.js"]}
               > **Node Version:** ${process.version}
               > **Bot Version:** ${this.config.botVersion}
               > **Dependencies:** ${Object.keys(dependencies).length}
@@ -280,7 +280,7 @@ export default class BotInfo extends Command {
               {
                 type: 2,
                 style: 5,
-                label: "Invite me!",
+                label: "Invite me !",
                 url: "https://discord.com/api/oauth2/authorize?client_id=1203014293549744189&permissions=70368744177655&scope=applications.commands+bot",
                 emoji: "🔗",
               },
