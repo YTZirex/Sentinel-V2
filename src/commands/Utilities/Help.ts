@@ -23,6 +23,7 @@ export default class Help extends Command {
       options: [
         {
           name: "category",
+          description: `The category of the commands you want to know more about.`,
           type: ApplicationCommandOptionType.String,
           required: true,
           choices: [
@@ -74,6 +75,10 @@ export default class Help extends Command {
             },
             fields: [
               {
+                name: "</help:1205927954685763605>",
+                value: `Provides informations about a category of commands.`,
+              },
+              {
                 name: "</botinfo:1204396655840075788>",
                 value: `Provides informations about the bot.`,
               },
@@ -99,6 +104,7 @@ export default class Help extends Command {
       return interaction.editReply({
         embeds: [
           {
+            title: "🛡️ Moderation",
             color: 0x6666ff,
             thumbnail: {
               url: interaction.guild?.iconURL()!,
@@ -138,6 +144,7 @@ export default class Help extends Command {
       return interaction.editReply({
         embeds: [
           {
+            title: "💸 Economy",
             color: 0x6666ff,
             thumbnail: {
               url: interaction.guild?.iconURL()!,
@@ -169,6 +176,7 @@ export default class Help extends Command {
       return interaction.editReply({
         embeds: [
           {
+            title: "🔑 Administration",
             color: 0x6666ff,
             thumbnail: {
               url: interaction.guild?.iconURL()!,
