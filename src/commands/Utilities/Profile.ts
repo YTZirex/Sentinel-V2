@@ -38,9 +38,9 @@ export default class Profile extends Command {
     let target = (interaction.options.getUser("target") ||
       interaction.member) as GuildMember;
 
-      let commandCounter = await CommandCounter.findOne({ global: 1 });
-      commandCounter!.profile.used += 1;
-      await commandCounter?.save();
+    let commandCounter = await CommandCounter.findOne({ global: 1 });
+    commandCounter!.profile.used += 1;
+    await commandCounter?.save();
 
     await interaction.deferReply({ ephemeral: false });
 
@@ -56,9 +56,6 @@ export default class Profile extends Command {
 
     let attachment = new AttachmentBuilder(buffer).setName(`profile.png`);
 
-    try {
-      let color = (await target.user.fetch()).accentColor;
-    } catch (err) {}
     interaction.editReply({
       files: [attachment],
     });
