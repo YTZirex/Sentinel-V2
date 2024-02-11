@@ -30,19 +30,19 @@ export default class Help extends Command {
           required: true,
           choices: [
             {
-              name: "Utilities",
+              name: "🛠️ Utilities",
               value: "utilities",
             },
             {
-              name: "Moderation",
+              name: "🛡️ Moderation",
               value: "moderation",
             },
             {
-              name: "Economy",
+              name: "💸 Economy",
               value: "economy",
             },
             {
-              name: "Administration",
+              name: "🔐 Administration",
               value: "administration",
             },
           ],
@@ -91,7 +91,7 @@ export default class Help extends Command {
               },
               fields: [
                 {
-                  name: "</help:1205927954685763605>",
+                  name: "</help:1205979101765173258>",
                   value:
                     guild.language === "fr"
                       ? "Donne des informations sur une catégorie de commandes."
@@ -238,7 +238,7 @@ export default class Help extends Command {
         return interaction.editReply({
           embeds: [
             {
-              title: "🔑 Administration",
+              title: "🔐 Administration",
               color: 0x6666ff,
               thumbnail: {
                 url: interaction.guild?.iconURL()!,

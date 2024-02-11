@@ -125,8 +125,11 @@ export default class BotInfo extends Command {
                 guild.language === "fr" ? "Créateurs" : "Creators"
               }**: Fadzuk, Matt
               > **${
+                guild.language === "fr" ? "Co-Créateurs" : "Co-Creators"
+              }**: Slipers
+              > **${
                 guild.language === "fr" ? "Développeurs" : "Developers"
-              }:** Matt
+              }**: Matt
               `,
           } /*
             new EmbedBuilder()
@@ -236,6 +239,7 @@ export default class BotInfo extends Command {
     
               __**Development Team:**__
               > **Creators**: Fadzuk, Matt
+              > **Co-Creators**: Slipers
               > **Developers:** Matt
               `,
           } /*

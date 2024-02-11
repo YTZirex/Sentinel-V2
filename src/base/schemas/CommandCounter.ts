@@ -77,6 +77,11 @@ interface CommandCounter {
   help: {
     used: number;
   };
+  stats: {
+    commands: {
+      used: number;
+    };
+  };
 }
 
 export default model<CommandCounter>(
@@ -157,6 +162,11 @@ export default model<CommandCounter>(
     },
     help: {
       used: Number,
+    },
+    stats: {
+      commands: {
+        used: Number,
+      },
     },
   })
 );

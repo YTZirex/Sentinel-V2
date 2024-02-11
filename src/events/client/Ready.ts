@@ -61,7 +61,7 @@ export default class Ready extends Event {
           .map((guild) => guild.memberCount)
           .reduce((a, b) => a + b, 0)} users!`,
         `Version ${this.client.config.botVersion}`,
-        `Released 10/02/2024 9:00PM !`,
+        `Released 10/02/2024 10:00PM !`,
         `${guildsFetchedSize} servers!`,
         `Online since ${this.uptimeString(Math.floor(process.uptime()))}`,
       ];
