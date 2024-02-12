@@ -101,12 +101,14 @@ export default class UserInfo extends Command {
                 ? "✅"
                 : "❌"
             }
-            > **${guild.language === "fr" ? "Rejoint:" : "Joined:"}:** <t:${(
+            > **${guild.language === "fr" ? "Rejoint:" : "Joined:"}** <t:${(
               fetchedMember.joinedTimestamp! / 1000
             ).toFixed(0)}:D>
-            > ${guild.language === "fr" ? "Position:" : `**Join Position:**`} ${
-              this.GetJoinPosition(interaction, fetchedMember)! + 1
-            } / ${interaction.guild?.memberCount}
+            > ${
+              guild.language === "fr" ? "**Position:**" : `**Join Position:**`
+            } ${this.GetJoinPosition(interaction, fetchedMember)! + 1} / ${
+              interaction.guild?.memberCount
+            }
             `,
           },
         ],
