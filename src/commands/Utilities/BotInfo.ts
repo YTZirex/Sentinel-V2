@@ -49,6 +49,7 @@ export default class BotInfo extends Command {
       interaction.reply({
         embeds: [
           {
+            title: ":question:  Sentinel : Informations",
             color: 0x6666ff,
             thumbnail: { url: this.client.user!.displayAvatarURL() },
             description: `
@@ -208,6 +209,7 @@ export default class BotInfo extends Command {
       interaction.reply({
         embeds: [
           {
+            title: ":question:  Sentinel : Informations",
             color: 0x6666ff,
             thumbnail: { url: this.client.user!.displayAvatarURL() },
             description: `
