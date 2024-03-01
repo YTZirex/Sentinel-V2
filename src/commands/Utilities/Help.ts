@@ -67,7 +67,8 @@ export default class Select extends Command {
                     },
                   },
                   {
-                    label: "Moderation",
+                    label:
+                      guild.language === "fr" ? "Modération" : "Moderation",
                     value: "moderation",
                     emoji: {
                       name: "🛡️",
