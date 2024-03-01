@@ -7,6 +7,10 @@ import {
 import CustomClient from "../../base/classes/CustomClient";
 import Event from "../../base/classes/Event";
 import Command from "../../base/classes/Command";
+import UserConfig from "../../base/schemas/UserConfig";
+import BlacklistedUser from "../../base/schemas/BlacklistedUser";
+import GuildConfig from "../../base/schemas/GuildConfig";
+import Category from "../../base/enums/Category";
 
 export default class CommandHandler extends Event {
   constructor(client: CustomClient) {
@@ -17,7 +21,7 @@ export default class CommandHandler extends Event {
     });
   }
 
-  Execute(interaction: ChatInputCommandInteraction) {
+  async Execute(interaction: ChatInputCommandInteraction) {
     let failEmbed = new EmbedBuilder().setTitle(`Oops!`).setColor("Red");
 
     if (!interaction.isChatInputCommand()) return;
@@ -32,7 +36,118 @@ export default class CommandHandler extends Event {
         ephemeral: true,
       });
 
-    if (command.dev && !this.client.config.devIds.includes(interaction.user.id))
+    let userConfig = await UserConfig.findOne({ id: interaction.user.id });
+
+    if (!userConfig) {
+      userConfig = await UserConfig.create({
+        id: interaction.user.id,
+        dev: false,
+        canBlacklist: false,
+      });
+      await userConfig.save();
+    }
+
+    let blacklistedUser = await BlacklistedUser.findOne({
+      id: interaction.user.id,
+    });
+
+    if (!blacklistedUser) {
+      blacklistedUser = await BlacklistedUser.create({
+        id: interaction.user.id,
+        blacklisted: false,
+        reason: "None",
+        moderator: "None",
+      });
+      await blacklistedUser.save();
+    }
+
+    if (blacklistedUser.blacklisted === true) {
+      let guild = await GuildConfig.findOne({ id: interaction.guildId });
+      if (guild && guild.language) {
+        return interaction.reply({
+          embeds: [
+            {
+              color: 0xff6666,
+              title: guild.language === "fr" ? "Oups!" : "Oops!",
+              description:
+                guild.language === "fr"
+                  ? "❌ Vous êtes actuellement blacklist de Sentinel. Pour contester votre sanction, veuillez rejoindre notre Support."
+                  : "❌ You are currently blacklisted from Sentinel. To appeal, please join our Support.",
+              thumbnail: { url: this.client.user!.displayAvatarURL() },
+            },
+          ],
+          ephemeral: true,
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 5,
+                  url: "https://discord.gg/My2BVCmJEY",
+                  label: "Support",
+                  emoji: "💬",
+                },
+              ],
+            },
+          ],
+        });
+      } else {
+        return interaction.reply({
+          ephemeral: true,
+          embeds: [
+            {
+              color: 0xff6666,
+              title: "Oops!",
+              description: `❌ You are currently blacklisted from Sentinel. To appeal, please join our Support.`,
+              thumbnail: {
+                url: this.client.user?.displayAvatarURL()!,
+              },
+            },
+          ],
+          components: [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 5,
+                  url: "https://discord.gg/My2BVCmJEY",
+                  label: "Support",
+                  emoji: "💬",
+                },
+              ],
+            },
+          ],
+        });
+      }
+    }
+
+    if (
+      command.dev &&
+      command.category === Category.Blacklist &&
+      userConfig.canBlacklist === false
+    ) {
+      return interaction.reply({
+        embeds: [
+          {
+            color: 0xff6666,
+            title: "Oops!",
+            description: `❌ You are not allowed to use this command.`,
+            thumbnail: {
+              url: this.client.user?.displayAvatarURL()!,
+            },
+          },
+        ],
+        ephemeral: true,
+      });
+    }
+
+    if (
+      command.dev &&
+      command.category !== Category.Blacklist &&
+      userConfig.dev === false
+    )
       return interaction.reply({
         embeds: [
           failEmbed.setDescription(`❌ This command is only for developers.`),

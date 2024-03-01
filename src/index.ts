@@ -1,3 +1,7 @@
 import CustomClient from "./base/classes/CustomClient";
 
-new CustomClient().Init();
+export function startBot() {
+  new CustomClient().Init();
+}
+
+startBot();

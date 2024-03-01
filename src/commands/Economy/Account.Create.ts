@@ -255,7 +255,7 @@ export default class AccountCreate extends SubCommand {
             if (guild && guild.language) {
               (
                 (await interaction.client.channels.fetch(
-                  "1187843483181011004"
+                  "1207753909532098600"
                 )) as TextChannel
               ).send({
                 content: `${
@@ -376,7 +376,7 @@ export default class AccountCreate extends SubCommand {
             } else {
               (
                 (await interaction.client.channels.fetch(
-                  "1187843483181011004"
+                  "1207753909532098600"
                 )) as TextChannel
               ).send({
                 content: `✅ A new account has been opened by ${interaction.user.username}\n_ID: ${economy._id}`,

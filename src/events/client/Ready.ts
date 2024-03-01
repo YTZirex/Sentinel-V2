@@ -4,6 +4,7 @@ import Event from "../../base/classes/Event";
 import colors from "colors";
 import Command from "../../base/classes/Command";
 import IConfig from "../../base/interfaces/IConfig";
+// import dbots from "dbots";
 
 colors.enable();
 
@@ -50,6 +51,22 @@ export default class Ready extends Event {
           .green
       );
     }
+    /*
+
+    const poster = new dbots.Poster({
+      client,
+      apiKeys: {
+        discordbotsgg: '…',
+        topgg: '…',
+        lsterminalink: '…',
+        carbon: '…'
+      },
+      clientLibrary: 'discord.js'
+    })
+  
+    // Starts an interval thats posts to all services every 30 minutes.
+    poster.startInterval()
+*/
 
     let guildsFetchedSize = (await this.client.guilds.fetch()).size;
     // Our pointer

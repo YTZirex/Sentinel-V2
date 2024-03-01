@@ -60,7 +60,7 @@ export default class AccountDelete extends SubCommand {
         try {
           (
             (await interaction.client.channels.fetch(
-              "1187843483181011004"
+              "1207753909532098600"
             )) as TextChannel
           ).send({
             content: `${
@@ -232,7 +232,7 @@ export default class AccountDelete extends SubCommand {
         try {
           (
             (await interaction.client.channels.fetch(
-              "1187843483181011004"
+              "1207753909532098600"
             )) as TextChannel
           ).send({
             content: `🗑️ A deletion procedure has been initiated on ${
